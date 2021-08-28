@@ -49,3 +49,10 @@
     例:utils.ErrorToEmail("测试邮件"，"测试邮件")
     utils.Email(目标邮箱多个的话用逗号分隔，邮件标题，邮件主体) 发送测试邮件
     例:utils.Email(”a.qq.com,b.qq.com“,"测试邮件"，"测试邮件")
+
+### api插入语句
+
+```sql
+    INSERT INTO `gva`.`sys_apis`(`created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES ( '2021-08-25 23:09:12', '2021-08-25 23:09:12', NULL, '/email/emailTest', '发送测试邮件', 'email', 'POST');
+    INSERT INTO `gva`.`sys_apis`(`created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES ( '2021-08-28 14:20:27', '2021-08-28 14:20:27', NULL, '/email/sendEmail', '发送邮件', 'email', 'POST');
+```
