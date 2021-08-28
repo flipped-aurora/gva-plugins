@@ -71,4 +71,10 @@ SendMarkdownMessage(content,title string,atMobiles []string,isAtAll bool)
         Body    string `json:"body"`    // 邮件内容
     }
 
+### 添加api SQL语句
 
+```sql
+    INSERT INTO `你的数据库名字`.`sys_apis`(`created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES ( '2021-08-25 23:09:12', '2021-08-25 23:09:12', NULL, '/notify/sendTextMessage', '发送文字消息', 'notify', 'POST');
+    INSERT INTO `你的数据库名字`.`sys_apis`(`created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES ( '2021-08-28 14:20:27', '2021-08-28 14:20:27', NULL, '/notify/sendLinkMessage', '发送图文链接消息', 'notify', 'POST');
+    INSERT INTO `你的数据库名字`.`sys_apis`(`created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES ( '2021-08-28 14:20:27', '2021-08-28 14:20:27', NULL, '/notify/sendMarkdownMessage', '发送markdown消息', 'notify', 'POST');
+```

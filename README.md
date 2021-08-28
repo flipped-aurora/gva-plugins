@@ -169,6 +169,12 @@
         Body    string `json:"body"`    // 邮件内容
     }
    
+### api插入语句
+
+    ```sql
+        INSERT INTO `你的数据库名字`.`sys_apis`(`created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES ( '2021-08-25 23:09:12', '2021-08-25 23:09:12', NULL, '/email/emailTest', '发送测试邮件', 'email', 'POST');
+        INSERT INTO `你的数据库名字`.`sys_apis`(`created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES ( '2021-08-28 14:20:27', '2021-08-28 14:20:27', NULL, '/email/sendEmail', '发送邮件', 'email', 'POST');
+    ```
 
 ```
 
