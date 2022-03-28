@@ -1,31 +1,16 @@
-package main
+package utils
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/flipped-aurora/gin-vue-admin/server/plugin/Zabbix/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/Zabbix/model/response"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
 
-//type getHostModel struct {
-//	Jsonrpc string `json:"jsonrpc"`
-//	Method  string `json:"method"`
-//	Params  struct {
-//		Output           []string `json:"output"`
-//		SelectInterfaces []string `json:"selectInterfaces"`
-//	} `json:"params"`
-//	ID   int    `json:"id"`
-//	Auth string `json:"auth"`
-//}
-
-type ResultModel struct {
-	Jsonrpc string `json:"jsonrpc"`
-	Result  string `json:"result"`
-	ID      int    `json:"id"`
-}
-
+//请求操作+byte转Json
 func PostProcessingJSON(ProcessStruct interface{}, url string) (Jsonstr string) {
 	jsonBytes, _ := json.Marshal(ProcessStruct)
 	body := string(jsonBytes)
@@ -42,8 +27,13 @@ func PostProcessingJSON(ProcessStruct interface{}, url string) (Jsonstr string) 
 	return JsonStr
 }
 
-func ZabbixLogin(username string, password string, url string) (resultToken string) {
-	var resultModel ResultModel
+//Zabbix API登录
+func ZabbixLogin() (resultToken string, resulturl string) {
+	//获取本地Config.yaml配置的Zabbix参数
+	username := global.GlobalConfig.Username
+	password := global.GlobalConfig.Password
+	url := global.GlobalConfig.Url
+	var resultModel response.ResultModel
 	var loginstrcut = response.ZabbixLoginModel{
 		Jsonrpc: "2.0",
 		Method:  "user.login",
@@ -55,42 +45,50 @@ func ZabbixLogin(username string, password string, url string) (resultToken stri
 			Password string
 		}{User: username, Password: password}),
 	}
+	//进行POST请求及Json转换
 	json.Unmarshal([]byte(PostProcessingJSON(loginstrcut, url)), &resultModel)
 	resultToken = resultModel.Result
-	return resultToken
+	resulturl = url
+	fmt.Println(resulturl, resultToken)
+	return resultToken, resulturl
 }
 
-func GetHostList() (r1 string) {
-	//var resultModel ResultModel
+//获取所有主机列表
+func GetHostList(resultToken string, zabbixurl string) (r1 string) {
+	//指定Zabbix返回值参数
 	var outPutList []string
 	var interfaceList []string
-	outPutList = append(outPutList, "hostid")
+	var groupsList []string
+	var templatsList []string
+	outPutList = append(outPutList, "name")
 	outPutList = append(outPutList, "host")
+	outPutList = append(outPutList, "proxy_hostid")
 	interfaceList = append(interfaceList, "interfaceid")
 	interfaceList = append(interfaceList, "ip")
+	groupsList = append(groupsList, "name")
+	templatsList = append(templatsList, "name")
 
-	result := ZabbixLogin("Admin", "zabbix@ngcc", "http://192.168.128.181/zabbix/api_jsonrpc.php")
-	fmt.Println(result)
 	var getHostStruct = response.GetHostModel{
 		Jsonrpc: "2.0",
 		Method:  "host.get",
 		Params: struct {
-			Output           []string `json:"output"`
-			SelectInterfaces []string `json:"selectInterfaces"`
+			Output                []string `json:"output"`
+			SelectInterfaces      []string `json:"selectInterfaces"`
+			SelectGroups          []string `json:"selectGroups"`
+			SelectParentTemplates []string `json:"selectParentTemplates"`
 		}(struct {
-			Output           []string
-			SelectInterfaces []string
-		}{Output: outPutList, SelectInterfaces: interfaceList}),
-		Auth: result,
+			Output                []string
+			SelectInterfaces      []string
+			SelectGroups          []string
+			SelectParentTemplates []string
+		}{Output: outPutList, SelectInterfaces: interfaceList, SelectGroups: groupsList, SelectParentTemplates: templatsList}),
+		Auth: resultToken,
 	}
-	fmt.Println(getHostStruct)
-	r1 = PostProcessingJSON(getHostStruct, "http://192.168.128.181/zabbix/api_jsonrpc.php")
+
+	r1 = PostProcessingJSON(getHostStruct, zabbixurl)
 	return r1
 }
 
-func main() {
-	//ZabbixLogin("Admin", "zabbix@ngcc", "http://192.168.128.181/zabbix/api_jsonrpc.php")
-	r1 := GetHostList()
-	fmt.Println(r1)
-	10099
+func GetItemsAll(resultToken string, zabbixurl string) {
+
 }
