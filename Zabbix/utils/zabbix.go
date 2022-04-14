@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-//请求操作+byte转Json
-func PostProcessingJSON(ProcessStruct interface{}, url string) (Jsonstr string) {
+//请求操作+byte转map
+func PostProcessingJSON(ProcessStruct interface{}, url string) (ResultMap interface{}, err error) {
 	jsonBytes, _ := json.Marshal(ProcessStruct)
 	body := string(jsonBytes)
 	response, err := http.Post(url, "application/json-rpc; charset=utf-8", strings.NewReader(body))
@@ -23,17 +23,22 @@ func PostProcessingJSON(ProcessStruct interface{}, url string) (Jsonstr string) 
 	if err != nil {
 		fmt.Println(err)
 	}
-	JsonStr := string(content)
-	return JsonStr
+	result := make(map[string]interface{})
+	err = json.Unmarshal(content, &result)
+	if err != nil {
+		fmt.Println(err)
+	}
+	//JsonStr := string(content)
+	return result["result"], err
 }
 
 //Zabbix API登录
-func ZabbixLogin() (resultToken string, resulturl string) {
+func ZabbixLogin() (resultToken interface{}, resulturl string) {
 	//获取本地Config.yaml配置的Zabbix参数
 	username := global.GlobalConfig.Username
 	password := global.GlobalConfig.Password
 	url := global.GlobalConfig.Url
-	var resultModel response.ResultModel
+	//var resultModel response.ResultModel
 	var loginstrcut = response.ZabbixLoginModel{
 		Jsonrpc: "2.0",
 		Method:  "user.login",
@@ -46,15 +51,16 @@ func ZabbixLogin() (resultToken string, resulturl string) {
 		}{User: username, Password: password}),
 	}
 	//进行POST请求及Json转换
-	json.Unmarshal([]byte(PostProcessingJSON(loginstrcut, url)), &resultModel)
-	resultToken = resultModel.Result
+	resultToken, err := PostProcessingJSON(loginstrcut, url)
+	if err != nil {
+		return err, resulturl
+	}
 	resulturl = url
-	fmt.Println(resulturl, resultToken)
 	return resultToken, resulturl
 }
 
 //获取所有主机列表
-func GetHostList(resultToken string, zabbixurl string) (r1 string) {
+func GetHostList(resultToken interface{}, zabbixurl string) (r1 interface{}) {
 	//指定Zabbix返回值参数
 	var outPutList []string
 	var interfaceList []string
@@ -63,6 +69,7 @@ func GetHostList(resultToken string, zabbixurl string) (r1 string) {
 	outPutList = append(outPutList, "name")
 	outPutList = append(outPutList, "host")
 	outPutList = append(outPutList, "proxy_hostid")
+	outPutList = append(outPutList, "status")
 	interfaceList = append(interfaceList, "interfaceid")
 	interfaceList = append(interfaceList, "ip")
 	groupsList = append(groupsList, "name")
@@ -85,10 +92,28 @@ func GetHostList(resultToken string, zabbixurl string) (r1 string) {
 		Auth: resultToken,
 	}
 
-	r1 = PostProcessingJSON(getHostStruct, zabbixurl)
+	r1, err := PostProcessingJSON(getHostStruct, zabbixurl)
+	if err != nil {
+		fmt.Println(err)
+	}
 	return r1
 }
 
-func GetItemsAll(resultToken string, zabbixurl string) {
+//根据web状态码进行监控网页状态
+func WebMonitor(urls []string) (webCodeStatusList []response.GetWebCodeStatusModel, err error) {
+	var getWebCodeStatus response.GetWebCodeStatusModel
+	getWebCodeStatusList := make([]response.GetWebCodeStatusModel, 0)
+	for _, v := range urls {
+		responseGet, _ := http.Get(v)
+		getWebCodeStatus.Url = v
+		if responseGet.StatusCode != 200 {
+			getWebCodeStatus.Status = "该web网址有异常"
+			getWebCodeStatusList = append(getWebCodeStatusList, getWebCodeStatus)
+		} else {
+			getWebCodeStatus.Status = "该web网址运行正常"
+			getWebCodeStatusList = append(getWebCodeStatusList, getWebCodeStatus)
+		}
+	}
 
+	return getWebCodeStatusList, nil
 }
