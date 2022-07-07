@@ -73,6 +73,9 @@
     修改接口： /es/updateEs [put] 
     根据ID查询接口： /es/getEsId [get] 
     全局查询接口： /es/getEsQuery [get] 
+    模糊查询接口： /es/getEsMultipleQuery [get]
+    更新经纬度接口： /es/updateEsLocation [put]
+    附近的人查询接口： /es/getEsNearby [get]
 
 ## 鸣谢
 

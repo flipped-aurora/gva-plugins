@@ -137,3 +137,58 @@ func (a *ElasticsearchApi) GetEsQuery(c *gin.Context) {
 		response.OkWithData(list, c)
 	}
 }
+
+// GetEsMultipleQuery 多字段搜索
+func (appHomeApi *AppHomeApi) GetEsMultipleQuery(c *gin.Context) {
+	var pageInfo autocodeReq.ElasticSearchSearch
+	_ = c.ShouldBindQuery(&pageInfo)
+	name := "test"
+	if err, list := service.ServiceGroupApp.GetQueryElasticsearch(pageInfo, name, "storeName", "barName", "brandName"); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithData(list, c)
+	}
+}
+
+// GetEsMultipleQuery 多字段搜索
+func (appHomeApi *AppHomeApi) GetEsMultipleQuery(c *gin.Context) {
+	var pageInfo autocodeReq.ElasticSearchSearch
+	_ = c.ShouldBindQuery(&pageInfo)
+	name := "test"
+	if err, list := service.ServiceGroupApp.GetQueryElasticsearch(pageInfo, name, "storeName", "barName", "brandName"); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithData(list, c)
+	}
+}
+
+// UpdateEsLocation 更新经纬度
+func (a *ElasticsearchApi) UpdateEsLocation(c *gin.Context) {
+	name := "user_location"
+	latitude := "30.5"
+	longitude := "120.5"
+	//用户ID或者商户ID
+	id := "1"
+	err, list := service.ServiceGroupApp.UpdateElasticsearchLocation(id, name, latitude, longitude)
+	if err != nil {
+		global.GVA_LOG.Error("失败!", zap.Any("err", err))
+		response.FailWithMessage("失败", c)
+	} else {
+		response.OkWithData(list, c)
+	}
+}
+
+// GetEsNearby 查询附近的人
+func (appHomeApi *AppHomeApi) GetEsNearby(c *gin.Context) {
+	var pageInfo autocodeReq.ElasticSearchSearch
+	_ = c.ShouldBindQuery(&pageInfo)
+	name := "user_location"
+	if err, list := service.ServiceGroupApp.GetElasticsearchNearby(pageInfo, name); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithData(list, c)
+	}
+}
