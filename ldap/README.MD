@@ -116,8 +116,8 @@ docker exec ldap-service ldapsearch -x -H ldap://localhost -b dc=example,dc=org 
         })
         try {
           const res = await provider(loginInfo)
-### 7. ldap的前端页面代码复用了GVA原有登陆页基础上做了一些修改
-    将 web/ldap 前端项目复制到 web/src/plugin 即刻
+### 7. ldap的前端页面代码复用了GVA原有登陆页，并在此基础上做了一些修改
+    将 web/ldap 前端项目复制到 web/src/plugin 即可
    
 ### api插入语句
 
