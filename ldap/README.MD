@@ -94,9 +94,29 @@ echo "Password: admin"
 docker exec ldap-service ldapsearch -x -H ldap://localhost -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w admin
 ```
 
-通过phpldapadmin创建LDAP用户，浏览器访问 http://127.0.0.1:8081/
-登陆名：cn=admin,dc=example,dc=org
+### phpLDAPadmin创建LDAP用户操作指导 
+#### 登录
+1. 浏览器访问 http://127.0.0.1:8081/ 
+2. 点击【Login】按钮，输入管理员密码
+管理员：cn=admin,dc=example,dc=org
 密码：admin
+
+#### 创建ldap用户操作：
+1. 点击dc=example,dc=org
+2. 点击ou=People ，如果没有就点击创建子条目创建，选择 Generic: Organisational Unit
+3. 创建一个子条目 (Create a child entry)
+4. 模版选择：默认，其他都是些奇奇怪怪得功能，我们用不着
+ObjectClasses选择：inetOrgPerson，创建账号记住选择这个
+点继续
+5. RDN下拉选择cn，这个记得操作，一定要操作这一步，否则后面点击创建对象没反应
+6. cn：用户的用户名xxx (建议不小于6位，gva用户登陆会校验长度)
+7. sn：用户姓名的姓xxx，confluence、gogs集成ldap需要
+8. givenName：用户姓名的名xxx，confluence、gogs集成ldap需要
+9. displayname：显示的用户名xxx，confluence、jenkins、gogs集成ldap需要
+10. mail：用户邮箱，confluence、jenkins、gogs集成ldap需要
+11. 密码：输入账号的密码xxx，后面下拉框选择crypt，加密  (建议不小于6位，gva用户登陆会校验长度)
+12. 点击创建对象
+13. 下一个页面会显示修改的明细信息，确认没问题了，点击提交
 
 ### 6. web 调试
     1. 前往GVA主程序下的 web/src/router/index.js, 更改登陆页的路由即可
@@ -107,8 +127,7 @@ docker exec ldap-service ldapsearch -x -H ldap://localhost -b dc=example,dc=org 
         component: () => import('@/plugin/ldap/view/index.vue')
     }
     
-    2. 为了复用登陆逻辑需要修改： web/src/pinia/modules/user.js
-    根据不同的登陆提供者处理登陆逻辑    
+    2. 为了复用登陆逻辑需要修改： web/src/pinia/modules/user.js 根据不同的登陆提供者处理登陆逻辑    
     const LoginIn = async(loginInfo, provider) => {
         loadingInstance.value = ElLoading.service({
           fullscreen: true,
@@ -116,6 +135,7 @@ docker exec ldap-service ldapsearch -x -H ldap://localhost -b dc=example,dc=org 
         })
         try {
           const res = await provider(loginInfo)
+    
 ### 7. ldap的前端页面代码复用了GVA原有登陆页，并在此基础上做了一些修改
     将 web/ldap 前端项目复制到 web/src/plugin 即可
    
