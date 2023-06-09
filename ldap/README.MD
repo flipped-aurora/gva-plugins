@@ -48,12 +48,12 @@
 
 ### 3. 方法API
 
-    utils.Search(req *utils.ldap.SearchRequest, resp *utils.ldap.SearchResult) 查询ldap信息
+    utils.Search(req *ldap.SearchRequest, resp *ldap.SearchResult) 查询ldap信息
     例:
-    var resp *utils.ldap.SearchResult
+    var resp *ldap.SearchResult
     utils.Search(utils.BuildSearchRequest(username), resp)
     
-    utils.SearchFunc(req *utils.ldap.SearchRequest, fn func(*ldap.SearchResult) error)) 查询ldap信息
+    utils.SearchFunc(req *ldap.SearchRequest, fn func(*ldap.SearchResult) error)) 查询ldap信息
     
     例:
     utils.Search(utils.BuildSearchRequest(username), func(resp *ldap.SearchResult) error){
