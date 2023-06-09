@@ -125,14 +125,42 @@ docker exec ldap-service ldapsearch -x -H ldap://localhost -b dc=example,dc=org 
         component: () => import('@/plugin/ldap/view/index.vue')
     }
     
-    2. 为了复用登陆逻辑需要修改： web/src/pinia/modules/user.js 根据不同的登陆提供者处理登陆逻辑    
+    2. 为了复用登陆逻辑需要修改： web/src/pinia/modules/user.js 
+    根据不同的登陆提供者处理登陆逻辑,替换原来的登录方法    
+    
+    /* 登录*/
     const LoginIn = async(loginInfo, provider) => {
         loadingInstance.value = ElLoading.service({
-          fullscreen: true,
-          text: '登录中，请稍候...',
+            fullscreen: true,
+            text: '登录中，请稍候...',
         })
         try {
-          const res = await provider(loginInfo)
+            const res = await provider(loginInfo)
+            if (res.code === 0) {
+                setUserInfo(res.data.user)
+                setToken(res.data.token)
+                const routerStore = useRouterStore()
+                await routerStore.SetAsyncRouter()
+                const asyncRouters = routerStore.asyncRouters
+                asyncRouters.forEach(asyncRouter => {
+                    router.addRoute(asyncRouter)
+                })
+                await router.replace({ name: userInfo.value.authority.defaultRouter })
+                loadingInstance.value.close()
+    
+                const isWin = ref(/windows/i.test(navigator.userAgent))
+                if (isWin.value) {
+                  window.localStorage.setItem('osType', 'WIN')
+                } else {
+                  window.localStorage.setItem('osType', 'MAC')
+                }
+                return true
+            }
+        } catch (e) {
+          loadingInstance.value.close()
+        }
+        loadingInstance.value.close()
+    }
     
 ### 7. ldap的前端页面代码复用了GVA原有登陆页，并在此基础上做了一些修改
     将 web/ldap 前端项目复制到 web/src/plugin 即可
