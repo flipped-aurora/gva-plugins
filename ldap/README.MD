@@ -105,9 +105,7 @@ docker exec ldap-service ldapsearch -x -H ldap://localhost -b dc=example,dc=org 
 1. 点击dc=example,dc=org
 2. 点击ou=People ，如果没有就点击创建子条目创建，选择 Generic: Organisational Unit
 3. 创建一个子条目 (Create a child entry)
-4. 模版选择：默认，其他都是些奇奇怪怪得功能，我们用不着
-ObjectClasses选择：inetOrgPerson，创建账号记住选择这个
-点继续
+4. 模版选择：默认，其他都是些奇奇怪怪得功能，我们用不着 ObjectClasses选择：inetOrgPerson，创建账号记住选择这个 点继续
 5. RDN下拉选择cn，这个记得操作，一定要操作这一步，否则后面点击创建对象没反应
 6. cn：用户的用户名xxx (建议不小于6位，gva用户登陆会校验长度)
 7. sn：用户姓名的姓xxx，confluence、gogs集成ldap需要
