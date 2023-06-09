@@ -25,7 +25,7 @@
 		"cn=admin,dc=example,dc=org",
 		"admin",
 		"(&(objectClass=organizationalPerson)(cn=%s))",
-		"name=cn&email=mail&phone=telephoneNumber",
+		"userName=cn&nickName=cn&email=mail&phone=mobile",
 		false,
 	))
 

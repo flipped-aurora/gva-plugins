@@ -39,6 +39,10 @@ func FillSysUser(u *systemModel.SysUser, entry *ldap.Entry, fm string) error {
 			u.Phone = attr
 		case "email":
 			u.Email = attr
+		case "userName":
+			u.Username = attr
+		case "nickName":
+			u.NickName = attr
 		}
 	}
 	return nil
